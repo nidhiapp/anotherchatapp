@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/dialogs/flushbar_plus_circularbar.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_colors.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/constants.dart';
@@ -19,6 +22,7 @@ class Profilepage extends StatefulWidget {
 class _ProfilepageState extends State<Profilepage> {
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
+  String? _image;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -62,33 +66,46 @@ class _ProfilepageState extends State<Profilepage> {
                         ),
                       ),
                       SizedBox(height: h! * 0.07),
-                      Stack(children: [
-                        Container(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(h! * 0.4),
-                            child: CachedNetworkImage(
-                              height: h! * 0.2,
-                              width: w! * 0.4,
-                              fit: BoxFit.fill,
-                              imageUrl: widget.user.image,
-                              errorWidget: (context, url, error) =>
-                                  CircleAvatar(
-                                child: Icon(Icons.person),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                            left: w! * 0.26,
-                            top: h! * 0.1,
-                            height: h! * 0.15,
-                            child: CircleAvatar(
-                              child: Icon(
+                      Stack(
+                        children: [
+                          _image != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(80),
+                                  child: Image.file(
+                                    File(_image!),
+                                    width: w! * 0.4,
+                                    height: h! * 0.2,
+                                    fit: BoxFit.fill,
+                                  ))
+                              : ClipRRect(
+                                  borderRadius: BorderRadius.circular(h! * 0.4),
+                                  child: CachedNetworkImage(
+                                    height: h! * 0.2,
+                                    width: w! * 0.4,
+                                    fit: BoxFit.fill,
+                                    imageUrl: widget.user.image,
+                                    errorWidget: (context, url, error) =>
+                                        CircleAvatar(
+                                      child: Icon(Icons.person),
+                                    ),
+                                  ),
+                                ),
+                          Positioned(
+                            top: h! * 0.13,
+                            left: w! * 0.29,
+                            child: InkWell(
+                              onTap: () {
+                                customModalBottomSheet();
+                              },
+                              child: CircleAvatar(
+                                  child: Icon(
                                 Icons.edit,
-                                color: AppColors.blackcolor,
-                              ),
-                            ))
-                      ]),
+                                color: Colors.black,
+                              )),
+                            ),
+                          )
+                        ],
+                      ),
                       SizedBox(
                         height: h! * 0.02,
                       ),
@@ -215,39 +232,35 @@ class _ProfilepageState extends State<Profilepage> {
                           return Container(
                               height: h! * 0.08,
                               width: w! * 0.4,
-                              child: Stack(
-                                children:[ Center(
+                              child: Stack(children: [
+                                Center(
                                   child: ElevatedButton.icon(
-                                      onPressed: () {
-                                        if (_formKey.currentState!.validate()) {
-                                          _formKey.currentState!.save();
-                                                              
-                                          UIHelpers.flushbarErrormessage(
-                                              "your profile has been updated",
-                                              context);
-                                          debugPrint("inside validator");
-                                        }
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          shape: StadiumBorder(),
-                                          backgroundColor: AppColors.primarycolor,
-                                          minimumSize: Size(w! * 0.01, h! * 0.01)),
-                                      label: Text("Update"),
-                                      icon: Icon(Icons.edit),
-                                      
-                                      
-                                      ),
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        _formKey.currentState!.save();
+                                        FbConstants.updateCurrentUserInfo();
+
+                                        UIHelpers.flushbarErrormessage(
+                                            "your profile has been updated",
+                                            context);
+                                        debugPrint("inside validator");
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                        shape: StadiumBorder(),
+                                        backgroundColor: AppColors.primarycolor,
+                                        minimumSize:
+                                            Size(w! * 0.01, h! * 0.01)),
+                                    label: Text("Update"),
+                                    icon: Icon(Icons.edit),
+                                  ),
                                 ),
-                                    if (value.isLoading) // Add this condition to show the CircularProgressIndicator
-                          Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                                    ]
-                              )
-                                  
-                                  
-                                  );
-                                  
+                                if (value
+                                    .isLoading) // Add this condition to show the CircularProgressIndicator
+                                  Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                              ]));
                         },
                       ),
                       SizedBox(
@@ -260,5 +273,102 @@ class _ProfilepageState extends State<Profilepage> {
             )),
       ),
     );
+  }
+
+  void customModalBottomSheet() {
+    showModalBottomSheet(
+        context: context,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.horizontal(left: Radius.circular(40.0))),
+        builder: (context) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 40.0),
+            child: Container(
+              height: h! * 0.2,
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Text(
+                      "Pick Your Profile Image",
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  SizedBox(
+                    height: h! * 0.02,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      InkWell(
+                          onTap: () async {
+                            final ImagePicker picker = ImagePicker();
+// Pick an image.
+                            final XFile? image = await picker.pickImage(
+                                source: ImageSource.camera,imageQuality: 80);
+
+                            if (image != null) {
+                              debugPrint(
+                                  'Image Path: ${image.path}----- Mime Type:${image.mimeType}');
+                              setState(() {
+                                _image = image.path;
+                              });
+                               FbConstants.updateProfilePicture(File(_image!));
+                              Navigator.pop(context);
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.camera,
+                                color: Color.fromARGB(246, 121, 39, 39),
+                                size: 40,
+                              ),
+                              Text("camera")
+                            ],
+                          )),
+                      SizedBox(
+                        width: w! * 0.3,
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          final ImagePicker picker = ImagePicker();
+// Pick an image.
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.gallery,imageQuality: 80);
+
+                          if (image != null) {
+                            debugPrint(
+                                'Image Path: ${image.path}----- Mime Type:${image.mimeType}');
+                            setState(() {
+                              _image = image.path;
+                            });
+                            FbConstants.updateProfilePicture(File(_image!));
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: Column(
+                          children: [
+                            const Icon(
+                              Icons.image,
+                              color: Color.fromARGB(246, 121, 39, 39),
+                              size: 40,
+                            ),
+                            Text("Gallery")
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

@@ -10,15 +10,15 @@ class ChatUserModel {
     required this.email,
     required this.lastActive,
   });
-  late final String image;
+  late  String image;
   late  String name= " ";
   late  String about=" ";
-  late final String createdAt;
-  late final String id;
-  late final bool isOnline;
-  late final String pushToken;
+  late  String createdAt;
+  late  String id;
+  late  bool isOnline;
+  late  String pushToken;
   late  String email= " ";
-  late final String lastActive;
+  late  String lastActive;
 
   ChatUserModel.fromJson(Map<String, dynamic> json) {
     image = json['image'] ?? ' ';

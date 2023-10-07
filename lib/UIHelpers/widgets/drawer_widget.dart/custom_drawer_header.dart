@@ -31,16 +31,16 @@ class _CustomDrawerHeaderState extends State<CustomDrawerHeader> {
             padding: EdgeInsets.all(15.0),
             child: Row(mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                CircleAvatar(radius: 30,
+                CircleAvatar(radius: 30,child: Icon(Icons.person),
                 ),
                   SizedBox(width:20),
                   Column(mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Cheeky Kid",style: TextStyle(fontSize: 17,fontWeight: FontWeight.w700),),
+                      Text("rida",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w700),),
                       Row(
                         children: [
-                          Text("4.5 ",),Icon(Icons.star_rounded,size: 20,color: Colors.amber,)
+                          Text(" ",),Icon(Icons.star_rounded,size: 20,color: Colors.amber,)
                         ],
                       ), 
                     ],

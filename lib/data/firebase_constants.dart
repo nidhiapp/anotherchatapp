@@ -1,5 +1,9 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:new_chatapp_chitchat/models/chat_user_model.dart';
 
@@ -7,6 +11,7 @@ class FbConstants {
   static late ChatUserModel myself;
   static FirebaseAuth auth = FirebaseAuth.instance;
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
+  static FirebaseStorage firestorage = FirebaseStorage.instance;
 
   static User get currentUser => auth.currentUser!;
   //static User get chatUser=> auth.use
@@ -65,5 +70,35 @@ class FbConstants {
         .collection('users')
         .where('id', isNotEqualTo: currentUser.uid)
         .snapshots();
+  }
+
+  //for updating information
+  static Future<void> updateCurrentUserInfo() async {
+    await firestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .update({'name': myself.name, 'about': myself.about});
+  }
+
+  //update profile picture of user
+
+  static Future<void> updateProfilePicture(File file) async {
+    final extension = file.path.split('.').last;
+    debugPrint('Extension: $extension');
+    final ref = firestorage
+        .ref()
+        .child('profile pictures/${currentUser.uid}.$extension');
+    ref
+        .putFile(file, SettableMetadata(contentType: 'image/$extension'))
+        .then((p0) async {
+      debugPrint("Data Transfereed: ${p0.bytesTransferred / 1000}kb");
+
+      //updating image in firestore database
+      myself.image = await ref.getDownloadURL();
+      await firestore
+          .collection('users')
+          .doc(currentUser.uid)
+          .update({'image': myself.image, 'about': myself.about});
+    });
   }
 }
