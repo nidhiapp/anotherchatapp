@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "872466926408",
+    "project_id": "talk-wave-cf18d",
+    "storage_bucket": "talk-wave-cf18d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:872466926408:android:631570048f92be0b50c17d",
+        "android_client_info": {
+          "package_name": "com.example.new_chatapp_chitchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "872466926408-s8cifdp9usgc63c2a5cpunaobrrlegao.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAd4_RohxK4CNEzmsWFyyzeTApwM34EVhE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "872466926408-s8cifdp9usgc63c2a5cpunaobrrlegao.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
