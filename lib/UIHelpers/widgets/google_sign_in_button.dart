@@ -3,7 +3,7 @@ import 'package:new_chatapp_chitchat/UIHelpers/routes/routes_name.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_colors.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_images.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/constants.dart';
-import 'package:new_chatapp_chitchat/res/methods_used.dart';
+import 'package:new_chatapp_chitchat/data/methods_used.dart';
 
 class GoogleSignInButton extends StatelessWidget {
   const GoogleSignInButton({super.key});

@@ -19,11 +19,6 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  bool login = false;
-  String email = "";
-   String password = "";
-    String fullname = "";
-    final _formKey = GlobalKey<FormState>();
   
 
   @override
