@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/dialogs/flushbar_plus_circularbar.dart';
@@ -21,7 +22,8 @@ class CustomDrawerBody extends StatelessWidget {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => Profilepage(user: FbConstants.myself)));
+                    builder: (context) =>
+                        Profilepage(user: FbConstants.myself)));
           },
           child: cards(
             icons: Icons.person_2_outlined,
@@ -43,6 +45,7 @@ class CustomDrawerBody extends StatelessWidget {
           onPressed: () async {
             await FbConstants.auth.signOut();
             await GoogleSignIn().signOut();
+            await FbConstants.updateActiveStatus(false);
             // ignore: use_build_context_synchronously
             bool confirmLogout = await showDialog(
                 context: context,
@@ -71,6 +74,7 @@ class CustomDrawerBody extends StatelessWidget {
                   );
                 });
             Navigator.pop(context);
+            FbConstants.auth = FirebaseAuth.instance;
             Navigator.pushReplacementNamed(context, RoutesName.login);
           },
           child: cards(

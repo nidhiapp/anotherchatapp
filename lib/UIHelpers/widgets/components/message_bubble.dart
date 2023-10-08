@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:new_chatapp_chitchat/UIHelpers/mydate.dart';
@@ -28,10 +29,22 @@ class _MessageBubbleState extends State<MessageBubble> {
         padding: const EdgeInsets.only(right: 100.0, left: 10),
         child: Container(
           padding: EdgeInsets.all(w! * 0.02),
-          child: Text(
+          child:widget.chats.type==Type.text? Text(
             widget.chats.msg,
             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-          ),
+          ):ClipRRect(
+              borderRadius: BorderRadius.circular(h! * 0.01),
+              child: CachedNetworkImage(
+                // height: h! * 0.15,
+                // width: w! * 0.13,
+                fit: BoxFit.fill,
+                imageUrl: widget.chats.msg,
+                placeholder: (context, url) => CircularProgressIndicator(),
+                errorWidget: (context, url, error) => CircleAvatar(
+                  child: Icon(Icons.image),
+                ),
+              ),
+            ),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(30.0),
@@ -80,10 +93,21 @@ class _MessageBubbleState extends State<MessageBubble> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
+                widget.chats.type==Type.text?   Text(
                     widget.chats.msg,
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                  ),
+                  ):ClipRRect(
+              borderRadius: BorderRadius.circular(h! * 0.01),
+              child: CachedNetworkImage(
+                // height: h! * 0.15,
+                // width: w! * 0.13,
+                fit: BoxFit.fill,
+                imageUrl: widget.chats.msg,
+                errorWidget: (context, url, error) => CircleAvatar(
+                  child: Icon(Icons.image),
+                ),
+              ),
+            ),
                 ]),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(

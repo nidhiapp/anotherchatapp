@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/routes/routes_name.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_colors.dart';
@@ -13,7 +14,6 @@ import 'package:new_chatapp_chitchat/UIHelpers/widgets/drawer_widget.dart/comple
 import 'package:new_chatapp_chitchat/data/firebase_constants.dart';
 import 'package:new_chatapp_chitchat/models/chat_user_model.dart';
 import 'package:new_chatapp_chitchat/views/chat_screen.dart';
-
 
 import 'package:new_chatapp_chitchat/views/profile_page.dart';
 import 'package:provider/provider.dart';
@@ -35,13 +35,25 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   @override
   void initState() {
     FbConstants.getSelfInfo();
+    FbConstants.updateActiveStatus(true);
+    SystemChannels.lifecycle.setMessageHandler((message) {
+      //resume---active
+      //pause---- inactive
+      if (FbConstants.auth.currentUser != null) {
+        if (message.toString().contains('resume')) {
+          FbConstants.updateActiveStatus(true);
+        }
+        if (message.toString().contains('pause')) {
+          FbConstants.updateActiveStatus(false);
+        }
+      }
+      return Future.value(message);
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-   
-
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: WillPopScope(
@@ -69,20 +81,23 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                     ),
                     autofocus: true,
                     onChanged: (value) {
-  _searchList.clear();
-  for (var i in _list) {
-    if (i.name.toLowerCase().contains(value.toLowerCase()) ||
-        i.email.toLowerCase().contains(value.toLowerCase())) {
-      _searchList.add(i);
-    }
-  }
-  print("Search Query: $value");
-  print("Search List Length: ${_searchList.length}");
-  setState(() {
-    // Update the widget with the new search results
-  });
-},
-
+                      _searchList.clear();
+                      for (var i in _list) {
+                        if (i.name
+                                .toLowerCase()
+                                .contains(value.toLowerCase()) ||
+                            i.email
+                                .toLowerCase()
+                                .contains(value.toLowerCase())) {
+                          _searchList.add(i);
+                        }
+                      }
+                      print("Search Query: $value");
+                      print("Search List Length: ${_searchList.length}");
+                      setState(() {
+                        // Update the widget with the new search results
+                      });
+                    },
                   ),
             backgroundColor: AppColors.whitecolor,
             actions: [
@@ -92,9 +107,8 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                       _isSearching = !_isSearching;
                     });
                   },
-                  icon: Icon(_isSearching
-                      ? Icons.cancel_rounded
-                      :Icons.search)),
+                  icon:
+                      Icon(_isSearching ? Icons.cancel_rounded : Icons.search)),
               IconButton(
                   onPressed: () {
                     Navigator.push(
@@ -110,9 +124,10 @@ class _HomeScreenViewState extends State<HomeScreenView> {
           drawer: CompleteDrawerIntegeration(),
           floatingActionButton: FloatingActionButton(
               onPressed: () {},
-              child: InkWell(onTap: () {
-                //Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatScreenView(user: )));
-              },
+              child: InkWell(
+                onTap: () {
+                  //Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatScreenView(user: )));
+                },
                 child: Icon(
                   Icons.add_comment_outlined,
                 ),

@@ -27,7 +27,9 @@ class _LoginViewState extends State<LoginView> {
     w = MediaQuery.of(context).size.width;
 
     return Scaffold(
+
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text(
             AppTexts.welcometoletschat,
             style: TextStyle(color: AppColors.blackcolor),

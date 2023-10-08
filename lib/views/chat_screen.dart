@@ -5,8 +5,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:new_chatapp_chitchat/UIHelpers/mydate.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_colors.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/constants.dart';
+import 'package:new_chatapp_chitchat/views/chat_user_info.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/widgets/components/message_bubble.dart';
 import 'package:new_chatapp_chitchat/data/firebase_constants.dart';
 import 'package:new_chatapp_chitchat/models/chat_user_model.dart';
@@ -45,16 +47,16 @@ class _ChatScreenViewState extends State<ChatScreenView> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: SafeArea(
         child: WillPopScope(
-           onWillPop: () {
-          if (_emoji) {
-            setState(() {
-              _emoji = !_emoji;
-            });
-            return Future.value(false);
-          } else {
-            return Future.value(true);
-          }
-        },
+          onWillPop: () {
+            if (_emoji) {
+              setState(() {
+                _emoji = !_emoji;
+              });
+              return Future.value(false);
+            } else {
+              return Future.value(true);
+            }
+          },
           child: Scaffold(
             backgroundColor: Color.fromARGB(237, 217, 222, 231),
             appBar: AppBar(
@@ -73,7 +75,8 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                             case ConnectionState.waiting:
                             case ConnectionState.none:
                               return const Center(
-                                child: Center(child: CircularProgressIndicator()),
+                                child:
+                                    Center(child: CircularProgressIndicator()),
                               );
                             //if some or all data is loaded then show it
                             case ConnectionState.active:
@@ -81,17 +84,17 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                               final data = snapshot.data?.docs;
                               // debugPrint(
                               //     "-----------------Data : ${jsonEncode(data![0].data())}");
-        
+
                               _list = data
-                                      ?.map(
-                                          (e) => MessageModel.fromJson(e.data()))
+                                      ?.map((e) =>
+                                          MessageModel.fromJson(e.data()))
                                       .toList() ??
                                   [];
-        
+
                               // _list = _list
                               //       .where((message) => message.msg.isNotEmpty)
                               //       .toList();
-        
+
                               if (_list.isNotEmpty) {
                                 return ListView.builder(
                                   controller: _scrollController,
@@ -142,7 +145,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
               onFieldSubmitted: (String messsage) {
                 if (_messageController.text.trim().isNotEmpty) {
                   FbConstants.sendMessages(
-                      widget.user, _messageController.text.trim());
+                      widget.user, _messageController.text.trim(), Type.text);
                   _messageController.clear(); // Clear the text field
                 }
               },
@@ -190,10 +193,10 @@ class _ChatScreenViewState extends State<ChatScreenView> {
               onPressed: () {
                 if (_messageController.text.trim().isNotEmpty) {
                   FbConstants.sendMessages(
-                    widget.user,
-                    _messageController.text
-                        .trim(), // Trim leading/trailing whitespace
-                  );
+                      widget.user,
+                      _messageController.text.trim(),
+                      Type.text // Trim leading/trailing whitespace
+                      );
                   _messageController.clear(); // Clear the text field
                 }
                 _scrollToBottom();
@@ -211,65 +214,100 @@ class _ChatScreenViewState extends State<ChatScreenView> {
 
   Widget _appBar() {
     return Container(
-      decoration: BoxDecoration(
-          gradient: LinearGradient(
-              colors: [AppColors.appBarColor1, AppColors.appBarColor2])),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(h! * 0.4),
-              child: CachedNetworkImage(
-                height: h! * 0.15,
-                width: w! * 0.13,
-                fit: BoxFit.fill,
-                imageUrl: widget.user.image,
-                errorWidget: (context, url, error) => CircleAvatar(
-                  child: Icon(Icons.person),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            width: w! * 0.15,
-          ),
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 2.0),
-                child: Text(
-                  widget.user.name,
-                  style: TextStyle(
-                      color: AppColors.chatUserTitleColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(
-                height: 0.02,
-              ),
-              Text(
-                "last Seen",
-                style: TextStyle(
-                    color: AppColors.chatUserTitleColor,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400),
-              )
-            ],
-          ),
-        ],
-      ),
-    );
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+                colors: [AppColors.appBarColor1, AppColors.appBarColor2])),
+        child: InkWell(onTap: () {
+          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => FriendsProfileInfo(user: widget.user,)));
+                        
+        },
+          child: StreamBuilder(
+              stream: FbConstants.usersInfo(widget.user),
+              builder: ((context, snapshot) {
+                final data = snapshot.data?.docs;
+        
+                final list =
+                    data?.map((e) => ChatUserModel.fromJson(e.data())).toList() ??
+                        [];
+        
+                return Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: InkWell(
+                        
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => FriendsProfileInfo(user: widget.user,)));
+                        
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(h! * 0.4),
+                          child: CachedNetworkImage(
+                            height: h! * 0.15,
+                            width: w! * 0.13,
+                            fit: BoxFit.fill,
+                            imageUrl: list.isNotEmpty
+                                ? list[0].image
+                                : widget.user.image,
+                            errorWidget: (context, url, error) => CircleAvatar(
+                              child: Icon(Icons.person),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: w! * 0.1,
+                    ),
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2.0),
+                          child: Text(
+                            list.isNotEmpty ? list[0].name : widget.user.name,
+                            style: TextStyle(
+                                color: AppColors.chatUserTitleColor,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 0.02,
+                        ),
+                        Text(
+                          list.isNotEmpty
+                              ? list[0].isOnline
+                                  ? 'Online'
+                                  : Mydate.getLastActiveTime(
+                                      context: context,
+                                      lastActive: widget.user.lastActive)
+                              : Mydate.getLastActiveTime(
+                                  context: context,
+                                  lastActive: widget.user.lastActive),
+                          style: TextStyle(
+                              color: AppColors.chatUserTitleColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400),
+                        )
+                      ],
+                    ),
+                  ],
+                );
+              })),
+        ));
   }
 
   void bottomSheet() {
@@ -312,10 +350,12 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                             if (image != null) {
                               debugPrint(
                                   'Image Path: ${image.path}----- Mime Type:${image.mimeType}');
-                              setState(() {
-                                _image = image.path;
-                              });
-                              FbConstants.updateProfilePicture(File(_image!));
+                              // setState(() {
+                              //   _image = image.path;
+                              // });
+                              FbConstants.sendChatImage(
+                                  widget.user, File(image.path));
+
                               Navigator.pop(context);
                             }
                           },
@@ -342,10 +382,12 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                           if (image != null) {
                             debugPrint(
                                 'Image Path: ${image.path}----- Mime Type:${image.mimeType}');
-                            setState(() {
-                              _image = image.path;
-                            });
-                            FbConstants.updateProfilePicture(File(_image!));
+                            // setState(() {
+                            //   _image = image.path;
+                            // });
+                            FbConstants.sendChatImage(
+                                widget.user, File(image.path));
+
                             Navigator.pop(context);
                           }
                         },

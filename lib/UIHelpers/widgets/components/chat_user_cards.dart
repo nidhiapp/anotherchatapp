@@ -65,9 +65,10 @@ class _ChatUserCardState extends State<ChatUserCard> {
                       ),
                     ),
                     title: Text(widget.user.name),
-                    subtitle: Text(_lastmessage != null
-                        ? _lastmessage!.msg
-                        : widget.user.about),
+                    subtitle: Text(_lastmessage != null? _lastmessage!.type==Type.image?'image':
+                        _lastmessage!.msg
+                        : widget.user.about,
+                        maxLines: 1,),
                     trailing:_lastmessage==null?
                      null:
                      _lastmessage!.read.isEmpty && _lastmessage!.sendBy != FbConstants.currentUser.uid? Container(

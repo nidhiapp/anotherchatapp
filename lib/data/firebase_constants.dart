@@ -125,13 +125,14 @@ class FbConstants {
 
   // TO send MESSSAGES
   //
-  static Future<void> sendMessages(ChatUserModel targetUser, String msg) async {
+  static Future<void> sendMessages(
+      ChatUserModel targetUser, String msg, Type type) async {
     final timeorMessageid = DateTime.now().millisecondsSinceEpoch.toString();
     final MessageModel message = MessageModel(
         msg: msg,
         read: ' ',
         sendTo: targetUser.id,
-        type: Type.text,
+        type: type,
         sent: timeorMessageid,
         sendBy: currentUser.uid);
     final ref = firestore.collection(
@@ -139,23 +140,76 @@ class FbConstants {
     await ref.doc(timeorMessageid).set(message.toJson());
   }
 
-
-  static Future <void>  updateMessageStatus(MessageModel chats)async{
-   await firestore.collection(
-        'chats/ ${getConversationIdOFusers(chats.sendBy)}/messages/')
-        .doc(chats.sent).update({"read":DateTime.now().microsecondsSinceEpoch.toString()});
-
-
-
-
+  static Future<void> updateMessageStatus(MessageModel chats) async {
+    await firestore
+        .collection(
+            'chats/ ${getConversationIdOFusers(chats.sendBy)}/messages/')
+        .doc(chats.sent)
+        .update({"read": DateTime.now().microsecondsSinceEpoch.toString()});
   }
 
-  static Stream<QuerySnapshot<Map<String, dynamic>>>  getLastMesasge(ChatUserModel targetUser){
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getLastMesasge(
+      ChatUserModel targetUser) {
     return firestore
         .collection(
-            'chats/ ${getConversationIdOFusers(targetUser.id)}/messages/').limit(1)
+            'chats/ ${getConversationIdOFusers(targetUser.id)}/messages/')
+        .orderBy('sent', descending: true)
+        .limit(1)
         .snapshots();
   }
 
+  //for chatimages
+  static void sendChatImage(ChatUserModel chatUser, File file) async {
+    final extension = file.path.split('.').last;
+    debugPrint('Extension: $extension');
+    final ref = firestorage.ref().child(
+        'images/${getConversationIdOFusers(chatUser.id)}/${DateTime.now().millisecondsSinceEpoch}.$extension');
+    await ref
+        .putFile(file, SettableMetadata(contentType: 'image/$extension'))
+        .then((p0) async {
+      debugPrint("Data Transfereed: ${p0.bytesTransferred / 1000}kb");
+
+      //updating image in firestore database
+      final imgUrl = await ref.getDownloadURL();
+      await sendMessages(chatUser, imgUrl, Type.image);
+    });
   }
 
+  /////----------------get last active time of user-------------------//////////
+  static Stream<QuerySnapshot<Map<String, dynamic>>> usersInfo(
+      ChatUserModel chatUser) {
+    return firestore
+        .collection('users')
+        .where('id', isEqualTo: chatUser.id)
+        .snapshots();
+  }
+
+  static Future<void> updateActiveStatus(bool isOnline) async {
+    return firestore.collection('users').doc(currentUser.uid).update({
+      'isOnline': isOnline,
+      'lastActive': DateTime.now().millisecondsSinceEpoch.toString()
+    });
+  }
+  // Future<void> deleteMessageforEveryone(
+  //       ChatUserModel chatUser, MessageModel message) async {
+  //     FirebaseFirestore.instance
+  //         .collection("chatrooms")
+  //         .doc(getConversationIdOFusers(chatUser.id))
+  //         .collection("messages")
+  //         .doc(message.timeorMessageid)
+  //         .delete();
+  //   }
+   
+  //   Future<void> deleteMessage(  MessageModel message, String receiver, int code) async {
+  //     await FirebaseFirestore.instance
+  //         .collection("chatrooms")
+  //         .doc(getChatRoomID(receiver))
+  //         .collection("messages")
+  //         .doc(message.messageid)
+  //         .update({"visibleNo": code}).then((value) {
+  //       debugPrint("Success Deletion");
+  //     }).onError((error, stackTrace) {
+  //       debugPrint("Error Deletion $error");
+  //     });
+  //   }
+}
