@@ -7,6 +7,7 @@ import 'package:new_chatapp_chitchat/UIHelpers/utils/app_colors.dart';
 import 'package:new_chatapp_chitchat/firebase_options.dart';
 
 import 'package:new_chatapp_chitchat/view_models/profile_page_provider.dart';
+import 'package:new_chatapp_chitchat/views/chat_screen.dart';
 import 'package:new_chatapp_chitchat/views/home_Screen.dart';
 import 'package:new_chatapp_chitchat/views/login_view.dart';
 import 'package:provider/provider.dart';
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primarycolor),
         useMaterial3: true,
       ),
-      
+     
       initialRoute: RoutesName.splash,
       onGenerateRoute: Routes.generateRoute,
     ));

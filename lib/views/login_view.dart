@@ -8,8 +8,8 @@ import 'package:new_chatapp_chitchat/UIHelpers/utils/app_colors.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_images.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_texts.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/constants.dart';
-import 'package:new_chatapp_chitchat/UIHelpers/widgets/custom_textfield.dart';
-import 'package:new_chatapp_chitchat/UIHelpers/widgets/google_sign_in_button.dart';
+import 'package:new_chatapp_chitchat/UIHelpers/widgets/components/custom_textfield.dart';
+import 'package:new_chatapp_chitchat/UIHelpers/widgets/components/google_sign_in_button.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});

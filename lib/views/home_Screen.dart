@@ -7,11 +7,12 @@ import 'package:new_chatapp_chitchat/UIHelpers/routes/routes_name.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_colors.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_texts.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/constants.dart';
-import 'package:new_chatapp_chitchat/UIHelpers/widgets/chat_user_cards.dart';
+import 'package:new_chatapp_chitchat/UIHelpers/widgets/components/chat_user_cards.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/widgets/drawer_widget.dart/complete_drawer_integration.dart';
 
 import 'package:new_chatapp_chitchat/data/firebase_constants.dart';
 import 'package:new_chatapp_chitchat/models/chat_user_model.dart';
+import 'package:new_chatapp_chitchat/views/chat_screen.dart';
 
 
 import 'package:new_chatapp_chitchat/views/profile_page.dart';
@@ -49,7 +50,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
             setState(() {
               _isSearching = !_isSearching;
             });
-            return Future.value(true);
+            return Future.value(false);
           } else {
             return Future.value(true);
           }
@@ -109,8 +110,12 @@ class _HomeScreenViewState extends State<HomeScreenView> {
           drawer: CompleteDrawerIntegeration(),
           floatingActionButton: FloatingActionButton(
               onPressed: () {},
-              child: Icon(
-                Icons.add_comment_outlined,
+              child: InkWell(onTap: () {
+                //Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatScreenView(user: )));
+              },
+                child: Icon(
+                  Icons.add_comment_outlined,
+                ),
               )),
           body: StreamBuilder(
               stream: FbConstants.getAllUsers(),

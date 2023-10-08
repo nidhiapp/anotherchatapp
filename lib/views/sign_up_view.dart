@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:new_chatapp_chitchat/UIHelpers/widgets/custom_round_button.dart';
-import 'package:new_chatapp_chitchat/UIHelpers/widgets/custom_textfield.dart';
+import 'package:new_chatapp_chitchat/UIHelpers/widgets/components/custom_round_button.dart';
+import 'package:new_chatapp_chitchat/UIHelpers/widgets/components/custom_textfield.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});

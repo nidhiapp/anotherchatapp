@@ -275,7 +275,7 @@ class _ProfilepageState extends State<Profilepage> {
     );
   }
 
-  void customModalBottomSheet() {
+ void customModalBottomSheet() {
     showModalBottomSheet(
         context: context,
         shape: RoundedRectangleBorder(
