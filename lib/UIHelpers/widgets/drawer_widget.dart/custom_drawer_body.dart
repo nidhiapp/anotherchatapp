@@ -30,52 +30,64 @@ class CustomDrawerBody extends StatelessWidget {
             texts: "My Profile",
           ),
         ),
-        cards(
-          icons: Icons.notifications_outlined,
-          texts: "Notifications",
+        MaterialButton(
+          onPressed: () {},
+          child: cards(
+            icons: Icons.notifications_outlined,
+            texts: "Notifications",
+          ),
         ),
-        cards(
-          icons: Icons.language_outlined,
-          texts: "Language",
-          text_1: "Eng ",
-          togglexits: true,
-          text_2: " Arabic",
+        MaterialButton(onPressed: () {
+          
+        },
+          child: cards(
+            icons: Icons.language_outlined,
+            texts: "Language",
+            text_1: "Eng ",
+            togglexits: true,
+            text_2: " Arabic",
+          ),
         ),
         MaterialButton(
           onPressed: () async {
-            await FbConstants.auth.signOut();
-            await GoogleSignIn().signOut();
-            await FbConstants.updateActiveStatus(false);
-            // ignore: use_build_context_synchronously
-            bool confirmLogout = await showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('Confirm Log Out'),
-                    content: const Text('Are you sure you want to log out?'),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(true);
-                          UIHelpers.showProgressBar(context);
-                          // UIHelpers.showProgressBar(context).then
-                          // User confirmed log out
-                        },
-                        child: const Text('Yes'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pop(false); // User canceled log out
-                        },
-                        child: const Text('No'),
-                      ),
-                    ],
-                  );
-                });
-            Navigator.pop(context);
-            FbConstants.auth = FirebaseAuth.instance;
-            Navigator.pushReplacementNamed(context, RoutesName.login);
+            if (FbConstants.auth.currentUser != null) {
+              FirebaseAuth.instance.signOut();
+              Navigator.pushNamedAndRemoveUntil(
+                  context, RoutesName.login, (route) => false);
+              //     FbConstants.auth = FirebaseAuth.instance;
+              // Navigator.pushReplacementNamed(context, RoutesName.login);
+              // Navigator.pop(context);
+              await FbConstants.auth.signOut();
+              await GoogleSignIn().signOut();
+              await FbConstants.updateActiveStatus(false);
+              // ignore: use_build_context_synchronously
+              bool confirmLogout = await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Confirm Log Out'),
+                      content: const Text('Are you sure you want to log out?'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(true);
+                            UIHelpers.showProgressBar(context);
+                            // UIHelpers.showProgressBar(context).then
+                            // User confirmed log out
+                          },
+                          child: const Text('Yes'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pop(false); // User canceled log out
+                          },
+                          child: const Text('No'),
+                        ),
+                      ],
+                    );
+                  });
+            }
           },
           child: cards(
             icons: Icons.logout_outlined,

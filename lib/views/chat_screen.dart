@@ -29,6 +29,8 @@ class _ChatScreenViewState extends State<ChatScreenView> {
   //showing or not
   bool _emoji = false;
   String? _image;
+  
+
   ScrollController _scrollController = ScrollController();
   TextEditingController _messageController = TextEditingController();
   ScrollController textEditingController = ScrollController();
@@ -82,18 +84,12 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                             case ConnectionState.active:
                             case ConnectionState.done:
                               final data = snapshot.data?.docs;
-                              // debugPrint(
-                              //     "-----------------Data : ${jsonEncode(data![0].data())}");
 
                               _list = data
                                       ?.map((e) =>
                                           MessageModel.fromJson(e.data()))
                                       .toList() ??
                                   [];
-
-                              // _list = _list
-                              //       .where((message) => message.msg.isNotEmpty)
-                              //       .toList();
 
                               if (_list.isNotEmpty) {
                                 return ListView.builder(
@@ -103,13 +99,24 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                                   padding: EdgeInsets.only(top: 10),
                                   physics: BouncingScrollPhysics(),
                                   itemBuilder: (context, index) {
-                                    return MessageBubble(chats: _list[index]);
+                                    final messages = _list[index];
+                                    return GestureDetector(
+                                      onLongPress: () {
+                                         setState(() {
+                                 messages.isSelected = !messages.isSelected;
+                                });
+
+                                      },
+                                      child: MessageBubble(chats: _list[index]),
+                                    );
+
+                                    
                                   },
                                 );
                               } else {
                                 return Center(
                                     child: Text(
-                                  "No connection found",
+                                  " say hi",
                                   style: TextStyle(fontSize: 20),
                                 ));
                               }
@@ -217,22 +224,25 @@ class _ChatScreenViewState extends State<ChatScreenView> {
         decoration: BoxDecoration(
             gradient: LinearGradient(
                 colors: [AppColors.appBarColor1, AppColors.appBarColor2])),
-        child: InkWell(onTap: () {
-          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FriendsProfileInfo(user: widget.user,)));
-                        
-        },
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => FriendsProfileInfo(
+                          user: widget.user,
+                        )));
+          },
           child: StreamBuilder(
               stream: FbConstants.usersInfo(widget.user),
               builder: ((context, snapshot) {
                 final data = snapshot.data?.docs;
-        
-                final list =
-                    data?.map((e) => ChatUserModel.fromJson(e.data())).toList() ??
-                        [];
-        
+
+                final list = data
+                        ?.map((e) => ChatUserModel.fromJson(e.data()))
+                        .toList() ??
+                    [];
+
                 return Row(
                   children: [
                     IconButton(
@@ -247,12 +257,11 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                     Padding(
                       padding: const EdgeInsets.all(2.0),
                       child: InkWell(
-                        
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => FriendsProfileInfo(user: widget.user,)));
-                        
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => FriendsProfileInfo(user: widget.user,)));
+
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(h! * 0.4),
                           child: CachedNetworkImage(
@@ -311,73 +320,39 @@ class _ChatScreenViewState extends State<ChatScreenView> {
   }
 
   void bottomSheet() {
+   
     showModalBottomSheet(
         context: context,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.horizontal(left: Radius.circular(40.0))),
         builder: (context) {
-          return Padding(
-            padding: const EdgeInsets.only(left: 40.0),
-            child: Container(
-              height: h! * 0.2,
-              width: double.infinity,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20.0),
-                    child: Text(
-                      "Pick Your Profile Image",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
+          return Container(
+            height: h! * 0.2,
+            width: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Text(
+                    "Pick Your Profile Image",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(
-                    height: h! * 0.02,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      InkWell(
-                          onTap: () async {
-                            final ImagePicker picker = ImagePicker();
-// Pick an image.
-                            final XFile? image = await picker.pickImage(
-                                source: ImageSource.camera, imageQuality: 80);
-
-                            if (image != null) {
-                              debugPrint(
-                                  'Image Path: ${image.path}----- Mime Type:${image.mimeType}');
-                              // setState(() {
-                              //   _image = image.path;
-                              // });
-                              FbConstants.sendChatImage(
-                                  widget.user, File(image.path));
-
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: Column(
-                            children: [
-                              const Icon(
-                                Icons.camera,
-                                color: Color.fromARGB(246, 121, 39, 39),
-                                size: 40,
-                              ),
-                              Text("camera")
-                            ],
-                          )),
-                      SizedBox(
-                        width: w! * 0.3,
-                      ),
-                      InkWell(
+                ),
+                SizedBox(
+                  height: h! * 0.02,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    InkWell(
                         onTap: () async {
                           final ImagePicker picker = ImagePicker();
 // Pick an image.
                           final XFile? image = await picker.pickImage(
-                              source: ImageSource.gallery, imageQuality: 80);
+                              source: ImageSource.camera, imageQuality: 80);
 
                           if (image != null) {
                             debugPrint(
@@ -394,18 +369,49 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                         child: Column(
                           children: [
                             const Icon(
-                              Icons.image,
+                              Icons.camera,
                               color: Color.fromARGB(246, 121, 39, 39),
                               size: 40,
                             ),
-                            Text("Gallery")
+                            Text("camera")
                           ],
-                        ),
-                      )
-                    ],
-                  ),
-                ],
-              ),
+                        )),
+                    SizedBox(
+                      width: w! * 0.3,
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        final ImagePicker picker = ImagePicker();
+// Pick an image.
+                        final XFile? image = await picker.pickImage(
+                            source: ImageSource.gallery, imageQuality: 80);
+
+                        if (image != null) {
+                          debugPrint(
+                              'Image Path: ${image.path}----- Mime Type:${image.mimeType}');
+                          // setState(() {
+                          //   _image = image.path;
+                          // });
+                          FbConstants.sendChatImage(
+                              widget.user, File(image.path));
+
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: Column(
+                        children: [
+                          const Icon(
+                            Icons.image,
+                            color: Color.fromARGB(246, 121, 39, 39),
+                            size: 40,
+                          ),
+                          Text("Gallery")
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ],
             ),
           );
         });

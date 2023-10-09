@@ -16,7 +16,6 @@ class Routes {
         return MaterialPageRoute(builder: (context) => SignUpView()); 
       case RoutesName.login:
         return MaterialPageRoute(builder: (context) => LoginView());
-        
       case RoutesName.home:
         return MaterialPageRoute(builder: (context) => HomeScreenView());
 

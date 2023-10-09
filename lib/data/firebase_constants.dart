@@ -15,7 +15,12 @@ class FbConstants {
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
   static FirebaseStorage firestorage = FirebaseStorage.instance;
 
-  static User get currentUser => auth.currentUser!;
+  static User? get currentUser {
+    if (auth.currentUser != null) {
+      return auth.currentUser!;
+    }
+    return FirebaseAuth.instance.currentUser!;
+  }
   //static User get chatUser=> auth.use
 
   static Future<bool> userExists() async {
@@ -30,7 +35,7 @@ class FbConstants {
   static Future<void> getSelfInfo() async {
     await firestore
         .collection("users")
-        .doc(currentUser.uid)
+        .doc(currentUser!.uid)
         .get()
         .then((currentUser) async {
       if (currentUser.exists) {
@@ -46,18 +51,18 @@ class FbConstants {
   static Future<void> createUser() async {
     final time = DateTime.now().millisecondsSinceEpoch.toString();
     final chatUserModal = ChatUserModel(
-        id: currentUser.uid.toString(),
-        email: currentUser.email.toString(),
-        name: currentUser.displayName.toString(),
+        id: currentUser!.uid.toString(),
+        email: currentUser!.email.toString(),
+        name: currentUser!.displayName.toString(),
         about: " lets use this amazing app", //currentUser.email.toString(),
-        image: currentUser.photoURL.toString(),
+        image: currentUser!.photoURL.toString(),
         createdAt: time,
         isOnline: false,
         lastActive: time,
         pushToken: '');
     return await firestore
         .collection('users')
-        .doc(currentUser.uid)
+        .doc(currentUser!.uid)
         .set(chatUserModal.toJson());
   }
 
@@ -70,7 +75,7 @@ class FbConstants {
   static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers() {
     return firestore
         .collection('users')
-        .where('id', isNotEqualTo: currentUser.uid)
+        .where('id', isNotEqualTo: currentUser!.uid)
         .snapshots();
   }
 
@@ -78,7 +83,7 @@ class FbConstants {
   static Future<void> updateCurrentUserInfo() async {
     await firestore
         .collection('users')
-        .doc(currentUser.uid)
+        .doc(currentUser!.uid)
         .update({'name': myself.name, 'about': myself.about});
   }
 
@@ -89,7 +94,7 @@ class FbConstants {
     debugPrint('Extension: $extension');
     final ref = firestorage
         .ref()
-        .child('profile pictures/${currentUser.uid}.$extension');
+        .child('profile pictures/${currentUser!.uid}.$extension');
     ref
         .putFile(file, SettableMetadata(contentType: 'image/$extension'))
         .then((p0) async {
@@ -99,7 +104,7 @@ class FbConstants {
       myself.image = await ref.getDownloadURL();
       await firestore
           .collection('users')
-          .doc(currentUser.uid)
+          .doc(currentUser!.uid)
           .update({'image': myself.image, 'about': myself.about});
     });
   }
@@ -119,9 +124,9 @@ class FbConstants {
   ///designing a specific user id for convo between two users----
   ///
   static String getConversationIdOFusers(String id) =>
-      currentUser.uid.hashCode <= id.hashCode
-          ? '${currentUser.uid}_$id'
-          : '${id}_${currentUser.uid}';
+      currentUser!.uid.hashCode <= id.hashCode
+          ? '${currentUser!.uid}_$id'
+          : '${id}_${currentUser!.uid}';
 
   // TO send MESSSAGES
   //
@@ -129,12 +134,20 @@ class FbConstants {
       ChatUserModel targetUser, String msg, Type type) async {
     final timeorMessageid = DateTime.now().millisecondsSinceEpoch.toString();
     final MessageModel message = MessageModel(
-        msg: msg,
-        read: ' ',
-        sendTo: targetUser.id,
-        type: type,
-        sent: timeorMessageid,
-        sendBy: currentUser.uid);
+      // id: timeorMessageid,
+      isSelected: false,
+      msg: msg,
+      read: ' ',
+      sendTo: targetUser.id,
+      type: type,
+      sent: timeorMessageid,
+      sendBy: currentUser!.uid,
+      isPinned: false,
+      isStarred: false,
+      isDeleted: false, // Assuming the message is not deleted initially
+      forwardedFrom: '', // Assuming it's not forwarded initially
+      replyToMessageId: '', // Assuming it's not a reply initiall
+    );
     final ref = firestore.collection(
         'chats/ ${getConversationIdOFusers(targetUser.id)}/messages/');
     await ref.doc(timeorMessageid).set(message.toJson());
@@ -185,31 +198,88 @@ class FbConstants {
   }
 
   static Future<void> updateActiveStatus(bool isOnline) async {
-    return firestore.collection('users').doc(currentUser.uid).update({
+    return firestore.collection('users').doc(currentUser!.uid).update({
       'isOnline': isOnline,
       'lastActive': DateTime.now().millisecondsSinceEpoch.toString()
     });
   }
-  // Future<void> deleteMessageforEveryone(
-  //       ChatUserModel chatUser, MessageModel message) async {
-  //     FirebaseFirestore.instance
-  //         .collection("chatrooms")
-  //         .doc(getConversationIdOFusers(chatUser.id))
-  //         .collection("messages")
-  //         .doc(message.timeorMessageid)
-  //         .delete();
-  //   }
-   
-  //   Future<void> deleteMessage(  MessageModel message, String receiver, int code) async {
-  //     await FirebaseFirestore.instance
-  //         .collection("chatrooms")
-  //         .doc(getChatRoomID(receiver))
-  //         .collection("messages")
-  //         .doc(message.messageid)
-  //         .update({"visibleNo": code}).then((value) {
-  //       debugPrint("Success Deletion");
-  //     }).onError((error, stackTrace) {
-  //       debugPrint("Error Deletion $error");
-  //     });
-  //   }
+
+//   static Future<void> deleteMessageFromBothSides(MessageModel chats) async {
+//   // Delete the message from the sender's chat
+//   await firestore
+//       .collection('chats/${getConversationIdOFusers(chats.sendTo)}/messages/')
+//       .doc(chats.sent)
+//       .delete();
+
+//   // Delete the same message from the receiver's chat
+//   await firestore
+//       .collection('chats/${getConversationIdOFusers(chats.sendBy)}/messages/')
+//       .doc(chats.sent)
+//       .delete();
+
+//   // If msg is an image, also delete it from Firebase Storage.
+//   if (chats.type == Type.image) {
+//     await firestorage.refFromURL(chats.msg).delete();
+//   }
+// }
+
+  static Future<void> deleteMessage(MessageModel chats) async {
+    // final messageId = DateTime.now().millisecondsSinceEpoch.toString();
+    await firestore
+        .collection(
+            'chats/ ${getConversationIdOFusers(chats.sendTo)}/messages/')
+        .doc(chats.sent)
+        .delete();
+    //if msg is an image
+    await firestorage.refFromURL(chats.msg).delete();
+  }
+
+  static Future<void> deleteOthersMessage(
+    MessageModel chats,
+  ) async {
+    // final messageId = DateTime.now().millisecondsSinceEpoch.toString();
+    await firestore
+        .collection(
+            'chats/ ${getConversationIdOFusers(chats.sendTo)}/messages/')
+        .doc(chats.read)
+        .delete();
+    //if msg is an image
+    await firestorage.refFromURL(chats.msg).delete();
+  }
+
+//update message
+
+  static Future<void> updateMessage(
+      MessageModel chats, String updatedMsg) async {
+    // final messageId = DateTime.now().millisecondsSinceEpoch.toString();
+    await firestore
+        .collection(
+            'chats/ ${getConversationIdOFusers(chats.sendTo)}/messages/')
+        .doc(chats.sent)
+        .update({'msg': updatedMsg});
+    //if msg is an image
+    //await firestorage.refFromURL(chats.msg).delete();
+  }
+
+  ///delete for all messages
+
+  static Future<void> deleteMessageForEveryone(
+      MessageModel chats, MessageModel chatUser) async {
+    await firestore
+        .collection(
+            'chats/ ${getConversationIdOFusers(chatUser.sendTo)}/messages/')
+        .doc(chats.sent)
+        .delete();
+  }
+
+  static Future<void> deleteReceivedMessageForMe(
+    MessageModel receivedMessage,
+  ) async {
+    // Delete the received message from your chat collection
+    await firestore
+        .collection(
+            'chats/${getConversationIdOFusers(receivedMessage.sendTo)}/messages/')
+        .doc(receivedMessage.sent)
+        .delete();
+  }
 }

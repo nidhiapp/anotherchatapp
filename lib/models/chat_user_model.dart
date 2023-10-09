@@ -10,6 +10,12 @@ class ChatUserModel {
     required this.email,
     required this.lastActive,
   });
+   ChatUserModel.withDefaults({
+    this.image = '',
+    this.id = '',
+    this.email = '',
+  });
+  
   late  String image;
   late  String name= " ";
   late  String about=" ";
@@ -26,8 +32,8 @@ class ChatUserModel {
     about = json['about'] ?? ' ';
     createdAt = json['created_at'] ?? '  ';
     id = json['id'] ?? ' ';
-   isOnline = json['is_online'] is bool ? json['is_online'] : json['is_online'] == 'true';
-   pushToken = json['push_token'] ?? ' ';
+    isOnline = json['is_online'] is bool ? json['is_online'] : json['is_online'] == 'true';
+    pushToken = json['push_token'] ?? ' ';
     email = json['email'] ?? '';
     lastActive = json['lastActive'] ?? '';
 

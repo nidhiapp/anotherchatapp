@@ -6,6 +6,7 @@ import 'package:new_chatapp_chitchat/UIHelpers/routes/routes_name.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_colors.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/constants.dart';
 import 'package:new_chatapp_chitchat/data/firebase_constants.dart';
+import 'package:new_chatapp_chitchat/views/home_Screen.dart';
 
 import 'package:provider/provider.dart';
 
@@ -24,12 +25,22 @@ class _SplashViewState extends State<SplashView> {
       SystemChrome.setSystemUIOverlayStyle(
           const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
       if (FbConstants.auth.currentUser != null) {
-          debugPrint('\nUser:${FbConstants.auth.currentUser}');
-        debugPrint('\nUseradditionalinfo:${FirebaseAuth.instance.currentUser}');
-         Navigator.pushNamed(context, RoutesName.home);
+        debugPrint('\nUser:${FbConstants.auth.currentUser!}');
+        debugPrint('\nUseradditionalinfo:${FirebaseAuth.instance.currentUser!}');
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomeScreenView()));
+
+        //Navigator.pushNamed(context, RoutesName.home);
       } else {
         Navigator.pushNamed(context, RoutesName.login);
       }
+
+      // if (FirebaseAuth.instance.currentUser! != null) {
+      //   Navigator.pushNamedAndRemoveUntil(
+      //       context, RoutesName.home, ((route) => false));
+      // } else {
+      //   Navigator.pushNamedAndRemoveUntil(context, RoutesName.login, ((route) => false));
+      // }
     });
     super.initState();
   }

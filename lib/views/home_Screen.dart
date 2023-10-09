@@ -19,7 +19,9 @@ import 'package:new_chatapp_chitchat/views/profile_page.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreenView extends StatefulWidget {
-  const HomeScreenView({super.key});
+  const HomeScreenView({
+    super.key,
+  });
 
   @override
   State<HomeScreenView> createState() => _HomeScreenViewState();
@@ -34,21 +36,23 @@ class _HomeScreenViewState extends State<HomeScreenView> {
 
   @override
   void initState() {
-    FbConstants.getSelfInfo();
-    FbConstants.updateActiveStatus(true);
-    SystemChannels.lifecycle.setMessageHandler((message) {
-      //resume---active
-      //pause---- inactive
-      if (FbConstants.auth.currentUser != null) {
-        if (message.toString().contains('resume')) {
-          FbConstants.updateActiveStatus(true);
+    if (FbConstants.auth.currentUser != null) {
+      FbConstants.getSelfInfo();
+      FbConstants.updateActiveStatus(true);
+      SystemChannels.lifecycle.setMessageHandler((message) {
+        //resume---active
+        //pause---- inactive
+        if (FbConstants.auth.currentUser != null) {
+          if (message.toString().contains('resume')) {
+            FbConstants.updateActiveStatus(true);
+          }
+          if (message.toString().contains('pause')) {
+            FbConstants.updateActiveStatus(false);
+          }
         }
-        if (message.toString().contains('pause')) {
-          FbConstants.updateActiveStatus(false);
-        }
-      }
-      return Future.value(message);
-    });
+        return Future.value(message);
+      });
+    }
     super.initState();
   }
 
@@ -99,7 +103,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                       });
                     },
                   ),
-            backgroundColor: AppColors.whitecolor,
+            backgroundColor: const Color.fromARGB(147, 7, 105, 151),
             actions: [
               IconButton(
                   onPressed: () {

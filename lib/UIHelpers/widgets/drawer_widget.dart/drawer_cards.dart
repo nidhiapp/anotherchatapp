@@ -41,7 +41,7 @@ class cards extends StatelessWidget {
               texts,
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
-            SizedBox(width: 80),
+            SizedBox(width: 30),
             Text(
               text_1,
               style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
