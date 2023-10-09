@@ -1,6 +1,6 @@
 class MessageModel {
   MessageModel({
-   // required this.id,
+    // required this.id,
     required this.msg,
     required this.read,
     required this.sendTo,
@@ -8,14 +8,15 @@ class MessageModel {
     required this.sent,
     required this.sendBy,
     required this.isPinned,
-    required this.isStarred,
+    this.isStarred = false,
     required this.isDeleted,
+     required this.isDeleteother,
     required this.forwardedFrom,
     required this.replyToMessageId,
-   required this. isSelected,
+    required this.isSelected,
   });
 
- // late final String id; // Unique message ID
+  // late final String id; // Unique message ID
   late final String msg;
   late final String read;
   late final String sendTo;
@@ -23,23 +24,27 @@ class MessageModel {
   late final String sent;
   late final String sendBy;
   late final bool isPinned;
-  late final bool isStarred;
+  late bool isStarred;
   late final bool isDeleted;
-  late final String forwardedFrom; // ID of the user who forwarded the message (empty if not forwarded)
+  late final bool isDeleteother;
+  late final String
+      forwardedFrom; // ID of the user who forwarded the message (empty if not forwarded)
   late final String replyToMessageId;
- late  final bool isSelected; // ID of the message being replied to (empty if not a reply)
+  late final bool
+      isSelected; // ID of the message being replied to (empty if not a reply)
 
   MessageModel.fromJson(Map<String, dynamic> json) {
-  // id = json['id'].toString();
+    // id = json['id'].toString();
     msg = json['msg'].toString();
     read = json['read'].toString();
     sendTo = json['sendTo'].toString();
     type = json['type'].toString() == Type.image.name ? Type.image : Type.text;
     sent = json['sent'].toString();
     sendBy = json['sendBy'].toString();
-    isPinned = json['isPinned'] as bool? ?? false; 
-    isStarred = json['isStarred'] as bool? ?? false;
+    isPinned = json['isPinned'] as bool? ?? false;
+    isStarred = json['isStarred'] = true;
     isDeleted = json['isDeleted'] as bool? ?? false;
+   isDeleteother = json['isDeleteother'] as bool? ?? false;
     isSelected = json['isSelected'] as bool? ?? false;
     forwardedFrom = json['forwardedFrom'].toString();
     replyToMessageId = json['replyToMessageId'].toString();
@@ -47,7 +52,7 @@ class MessageModel {
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-  //  data['id'] = id;
+    //  data['id'] = id;
     data['msg'] = msg;
     data['read'] = read;
     data['sendTo'] = sendTo;
@@ -57,7 +62,8 @@ class MessageModel {
     data['isPinned'] = isPinned;
     data['isStarred'] = isStarred;
     data['isDeleted'] = isDeleted;
-     data['isSelected'] = isSelected;
+     data['isDeleteother'] = isDeleteother;
+    data['isSelected'] = isSelected;
     data['forwardedFrom'] = forwardedFrom;
     data['replyToMessageId'] = replyToMessageId;
     return data;

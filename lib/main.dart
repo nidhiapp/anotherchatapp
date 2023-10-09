@@ -5,6 +5,7 @@ import 'package:new_chatapp_chitchat/UIHelpers/routes/routes.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/routes/routes_name.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_colors.dart';
 import 'package:new_chatapp_chitchat/firebase_options.dart';
+import 'package:new_chatapp_chitchat/view_models/chat_screen_provide.dart';
 
 import 'package:new_chatapp_chitchat/view_models/profile_page_provider.dart';
 import 'package:new_chatapp_chitchat/views/chat_screen.dart';
@@ -28,6 +29,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
       ChangeNotifierProvider(create: (_) => ProfilePageProvider()),
+       ChangeNotifierProvider(create: (_) => ChatScreenModelProvider()),
+     
+      
      
       
     ],

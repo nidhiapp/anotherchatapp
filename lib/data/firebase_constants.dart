@@ -135,6 +135,7 @@ class FbConstants {
     final timeorMessageid = DateTime.now().millisecondsSinceEpoch.toString();
     final MessageModel message = MessageModel(
       // id: timeorMessageid,
+
       isSelected: false,
       msg: msg,
       read: ' ',
@@ -144,6 +145,7 @@ class FbConstants {
       sendBy: currentUser!.uid,
       isPinned: false,
       isStarred: false,
+      isDeleteother: false,
       isDeleted: false, // Assuming the message is not deleted initially
       forwardedFrom: '', // Assuming it's not forwarded initially
       replyToMessageId: '', // Assuming it's not a reply initiall
@@ -199,29 +201,10 @@ class FbConstants {
 
   static Future<void> updateActiveStatus(bool isOnline) async {
     return firestore.collection('users').doc(currentUser!.uid).update({
-      'isOnline': isOnline,
+      'is_online': isOnline,
       'lastActive': DateTime.now().millisecondsSinceEpoch.toString()
     });
   }
-
-//   static Future<void> deleteMessageFromBothSides(MessageModel chats) async {
-//   // Delete the message from the sender's chat
-//   await firestore
-//       .collection('chats/${getConversationIdOFusers(chats.sendTo)}/messages/')
-//       .doc(chats.sent)
-//       .delete();
-
-//   // Delete the same message from the receiver's chat
-//   await firestore
-//       .collection('chats/${getConversationIdOFusers(chats.sendBy)}/messages/')
-//       .doc(chats.sent)
-//       .delete();
-
-//   // If msg is an image, also delete it from Firebase Storage.
-//   if (chats.type == Type.image) {
-//     await firestorage.refFromURL(chats.msg).delete();
-//   }
-// }
 
   static Future<void> deleteMessage(MessageModel chats) async {
     // final messageId = DateTime.now().millisecondsSinceEpoch.toString();
@@ -229,20 +212,19 @@ class FbConstants {
         .collection(
             'chats/ ${getConversationIdOFusers(chats.sendTo)}/messages/')
         .doc(chats.sent)
-        .delete();
+        .update({"isDeleted": true});
     //if msg is an image
     await firestorage.refFromURL(chats.msg).delete();
   }
 
-  static Future<void> deleteOthersMessage(
-    MessageModel chats,
-  ) async {
+  //dlete other use's sidemessage
+  static Future<void> deleteOthersMessage(MessageModel chats) async {
     // final messageId = DateTime.now().millisecondsSinceEpoch.toString();
     await firestore
         .collection(
-            'chats/ ${getConversationIdOFusers(chats.sendTo)}/messages/')
-        .doc(chats.read)
-        .delete();
+            'chats/ ${getConversationIdOFusers(chats.sendBy)}/messages/')
+        .doc(chats.sent)
+        .update({"isDeleteother": true});
     //if msg is an image
     await firestorage.refFromURL(chats.msg).delete();
   }
@@ -281,5 +263,53 @@ class FbConstants {
             'chats/${getConversationIdOFusers(receivedMessage.sendTo)}/messages/')
         .doc(receivedMessage.sent)
         .delete();
+  }
+
+  //to star messages
+
+//   static Future<void> starMessages(MessageModel message) async {
+//   try {
+//     final messageRef = firestore
+//         .collection('chats/${getConversationIdOFusers(message.sendBy)}/messages/')
+//         .doc(message.sent);
+
+//     final documentSnapshot = await messageRef.get();
+
+//     if (documentSnapshot.exists) {
+//       final data = documentSnapshot.data();
+//       if (data != null) {
+//         // Update the 'isStarred' field here
+//         await messageRef.update({"isStarred": !data["isStarred"]});
+//         print("Message starred/unstarred successfully");
+//       }
+//     } else {
+//       print("Document does not exist");
+//     }
+//   } catch (e) {
+//     print("Error occurs while updating star message: $e");
+//   }
+// }
+
+  static Future<void> starMessages(MessageModel message) async {
+    final ref = firestore.collection(
+        'chats/ ${getConversationIdOFusers(message.sendBy)}/messages/');
+    final messageRef = ref.doc(message.sent);
+
+    await messageRef.update({'isStarred': true});
+    // debugPrint(
+    //     "Message id is ${message.sent} and star value is ${message.isStarred} conversational id is :${getConversationIdOFusers(message.sendBy)} sent : ${message.sent}");
+    // if (messageSnapshot.exists) {
+    //   await messageRef.update({"isStarred": message.sent});
+    // } else {
+    //   debugPrint("Doc not exist");
+    // }
+  }
+
+  static Future<void> DoNotstarMessages(MessageModel message) async {
+    final ref = firestore.collection(
+        'chats/ ${getConversationIdOFusers(message.sendBy)}/messages/');
+    final messageRef = ref.doc(message.sent);
+
+    await messageRef.update({'isStarred': false});
   }
 }

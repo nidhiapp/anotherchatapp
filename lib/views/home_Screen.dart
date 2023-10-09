@@ -13,6 +13,7 @@ import 'package:new_chatapp_chitchat/UIHelpers/widgets/drawer_widget.dart/comple
 
 import 'package:new_chatapp_chitchat/data/firebase_constants.dart';
 import 'package:new_chatapp_chitchat/models/chat_user_model.dart';
+import 'package:new_chatapp_chitchat/models/message_model.dart';
 import 'package:new_chatapp_chitchat/views/chat_screen.dart';
 
 import 'package:new_chatapp_chitchat/views/profile_page.dart';
@@ -20,8 +21,9 @@ import 'package:provider/provider.dart';
 
 class HomeScreenView extends StatefulWidget {
   const HomeScreenView({
-    super.key,
+    super.key, //required this. chat
   });
+  //final MessageModel chat;
 
   @override
   State<HomeScreenView> createState() => _HomeScreenViewState();
@@ -71,7 +73,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
             return Future.value(true);
           }
         },
-        child: Scaffold(
+        child: Scaffold(backgroundColor: AppColors.homebgcolor,
           appBar: AppBar(
             title: !_isSearching
                 ? Text(
@@ -162,6 +164,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                             user: _isSearching
                                 ? _searchList[index]
                                 : _list[index],
+                          //  chats: widget.chat,
                           );
                         },
                         padding: EdgeInsets.only(top: h! * 0.002),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:new_chatapp_chitchat/UIHelpers/utils/app_colors.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/widgets/drawer_widget.dart/custom_drawer_body.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/widgets/drawer_widget.dart/custom_drawer_header.dart';
 
@@ -16,12 +17,12 @@ class _CompleteDrawerIntegerationState extends State<CompleteDrawerIntegeration>
     return  Padding(
             padding: const EdgeInsets.only(top:50.0),
             child: ClipRRect(
-              borderRadius: BorderRadius.only(topRight: Radius.circular(20)),
+              borderRadius: const BorderRadius.only(topRight: Radius.circular(20)),
               child: Drawer(
                 
                 
 
-                backgroundColor:Color.fromARGB(255, 211, 198, 198) ,
+                backgroundColor:AppColors.bgcolor ,
                 
               child: Column(
                 children: [Container(
@@ -35,7 +36,7 @@ class _CompleteDrawerIntegerationState extends State<CompleteDrawerIntegeration>
               topRight: Radius.circular(20))),
       padding: const EdgeInsets.only(top: 30),
 
-      child: const Padding(
+      child:  const Padding(
         padding: EdgeInsets.only(bottom: 15.0, right: 15.0),
         child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -60,9 +61,9 @@ class _CompleteDrawerIntegerationState extends State<CompleteDrawerIntegeration>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "rida",
+                          "One drawer at a Time",
                           style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w700),
+                              fontSize: 15, fontWeight: FontWeight.w700),
                         ),
                         Row(
                           children: [
@@ -89,8 +90,8 @@ class _CompleteDrawerIntegerationState extends State<CompleteDrawerIntegeration>
                   child: CustomDrawerBody(
                     
                   )),
-                  SizedBox(height: 60,),
-                   Align(alignment: Alignment.bottomCenter,
+                  const SizedBox(height: 60,),
+                   const Align(alignment: Alignment.bottomCenter,
               child: Text("App version 4.18.2(1)",style: TextStyle(fontWeight: FontWeight.w500),
               )
               )

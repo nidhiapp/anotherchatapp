@@ -6,12 +6,17 @@ import 'package:new_chatapp_chitchat/UIHelpers/routes/routes_name.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_colors.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/constants.dart';
 import 'package:new_chatapp_chitchat/data/firebase_constants.dart';
+import 'package:new_chatapp_chitchat/models/chat_user_model.dart';
+import 'package:new_chatapp_chitchat/models/message_model.dart';
 import 'package:new_chatapp_chitchat/views/home_Screen.dart';
 
 import 'package:provider/provider.dart';
 
 class SplashView extends StatefulWidget {
-  const SplashView({super.key});
+  SplashView({super.key, 
+  //required this.chats
+  });
+ // final MessageModel chats;
 
   @override
   State<SplashView> createState() => _SplashViewState();
@@ -26,11 +31,12 @@ class _SplashViewState extends State<SplashView> {
           const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
       if (FbConstants.auth.currentUser != null) {
         debugPrint('\nUser:${FbConstants.auth.currentUser!}');
-        debugPrint('\nUseradditionalinfo:${FirebaseAuth.instance.currentUser!}');
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomeScreenView()));
+        debugPrint(
+            '\nUseradditionalinfo:${FirebaseAuth.instance.currentUser!}');
+        // Navigator.push(
+        //     context, MaterialPageRoute(builder: (context) => HomeScreenView(chats: widget.chats,)));
 
-        //Navigator.pushNamed(context, RoutesName.home);
+        Navigator.pushNamed(context, RoutesName.home);
       } else {
         Navigator.pushNamed(context, RoutesName.login);
       }
@@ -60,14 +66,20 @@ class _SplashViewState extends State<SplashView> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Image.asset(
-                //   "assets/images/chatgif.gif",
-                //   height: h! * 0.3,
-                // ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(80),
+                      child: Image.network(
+                          "https://cdn.dribbble.com/users/2058540/screenshots/8225138/media/af6d6d059328c6f2f9f6e7878c094c7e.gif")),
+                ),
+                SizedBox(
+                  height: h! * 0.02,
+                ),
                 Text(
-                  " Welcome to the ChatApp",
+                  " TALK-WAVE",
                   style: TextStyle(
-                    color: Colors.indigo,
+                    color: Color.fromARGB(255, 241, 240, 234),
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                     shadows: [

@@ -12,8 +12,10 @@ import 'package:new_chatapp_chitchat/views/chat_screen.dart';
 
 class ChatUserCard extends StatefulWidget {
   final ChatUserModel user;
+  //final MessageModel chats;
 
-  ChatUserCard({super.key, required this.user});
+  ChatUserCard({super.key, required this.user,//required this.chats
+  });
 
   @override
   State<ChatUserCard> createState() => _ChatUserCardState();
@@ -35,7 +37,7 @@ class _ChatUserCardState extends State<ChatUserCard> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ChatScreenView(user: widget.user)));
+                      builder: (context) => ChatScreenView(user: widget.user,)));
             },
             child: StreamBuilder(
                 stream: FbConstants.getLastMesasge(widget.user),

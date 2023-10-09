@@ -36,8 +36,6 @@ class ChatUserModel {
     pushToken = json['push_token'] ?? ' ';
     email = json['email'] ?? '';
     lastActive = json['lastActive'] ?? '';
-
-
     
   }
 

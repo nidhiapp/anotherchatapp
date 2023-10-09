@@ -10,6 +10,7 @@ class Routes {
   static MaterialPageRoute<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case RoutesName.splash:
+     // Map<String, dynamic> args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(builder: (context) => SplashView());
         
        case RoutesName.signup:

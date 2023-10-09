@@ -8,16 +8,21 @@ import 'package:image_picker/image_picker.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/mydate.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/app_colors.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/utils/constants.dart';
+import 'package:new_chatapp_chitchat/view_models/chat_screen_provide.dart';
 import 'package:new_chatapp_chitchat/views/chat_user_info.dart';
 import 'package:new_chatapp_chitchat/UIHelpers/widgets/components/message_bubble.dart';
 import 'package:new_chatapp_chitchat/data/firebase_constants.dart';
 import 'package:new_chatapp_chitchat/models/chat_user_model.dart';
 import 'package:new_chatapp_chitchat/models/message_model.dart';
+import 'package:provider/provider.dart';
 
 class ChatScreenView extends StatefulWidget {
   final ChatUserModel user;
+ // final MessageModel chats;
 
-  ChatScreenView({super.key, required this.user});
+  ChatScreenView({super.key, required this.user, 
+  //required this.chats
+  });
 
   @override
   State<ChatScreenView> createState() => _ChatScreenViewState();
@@ -26,10 +31,11 @@ class ChatScreenView extends StatefulWidget {
 class _ChatScreenViewState extends State<ChatScreenView> {
   //for storing all messages
   List<MessageModel> _list = [];
+  //to store selected messages
+
   //showing or not
   bool _emoji = false;
   String? _image;
-  
 
   ScrollController _scrollController = ScrollController();
   TextEditingController _messageController = TextEditingController();
@@ -60,80 +66,99 @@ class _ChatScreenViewState extends State<ChatScreenView> {
             }
           },
           child: Scaffold(
-            backgroundColor: Color.fromARGB(237, 217, 222, 231),
+            backgroundColor: const Color.fromARGB(237, 217, 222, 231),
             appBar: AppBar(
               // backgroundColor:
               automaticallyImplyLeading: false,
               flexibleSpace: _appBar(),
             ),
-            body: Column(
-              children: [
-                Expanded(
-                    child: StreamBuilder(
-                        stream: FbConstants.getAllMessages(widget.user),
-                        builder: (context, snapshot) {
-                          switch (snapshot.connectionState) {
-                            //if data is loading
-                            case ConnectionState.waiting:
-                            case ConnectionState.none:
-                              return const Center(
-                                child:
-                                    Center(child: CircularProgressIndicator()),
-                              );
-                            //if some or all data is loaded then show it
-                            case ConnectionState.active:
-                            case ConnectionState.done:
-                              final data = snapshot.data?.docs;
-
-                              _list = data
-                                      ?.map((e) =>
-                                          MessageModel.fromJson(e.data()))
-                                      .toList() ??
-                                  [];
-
-                              if (_list.isNotEmpty) {
-                                return ListView.builder(
-                                  controller: _scrollController,
-                                  reverse: false,
-                                  itemCount: _list.length,
-                                  padding: EdgeInsets.only(top: 10),
-                                  physics: BouncingScrollPhysics(),
-                                  itemBuilder: (context, index) {
-                                    final messages = _list[index];
-                                    return GestureDetector(
-                                      onLongPress: () {
-                                         setState(() {
-                                 messages.isSelected = !messages.isSelected;
-                                });
-
+            body: Stack(
+              children:[ Image.asset('assets/images/chtbg.png',height: h!*1.8,width: w!*1,fit: BoxFit.fill,),
+                Container(
+                child: Column(
+                  children: [
+                    Expanded(
+                        child: StreamBuilder(
+                            stream: FbConstants.getAllMessages(widget.user),
+                            builder: (context, snapshot) {
+                              switch (snapshot.connectionState) {
+                                //if data is loading
+                                case ConnectionState.waiting:
+                                case ConnectionState.none:
+                                  return const Center(
+                                    child:
+                                        Center(child: CircularProgressIndicator()),
+                                  );
+                                //if some or all data is loaded then show it
+                                case ConnectionState.active:
+                                case ConnectionState.done:
+                                  final data = snapshot.data?.docs;
+                          
+                                  _list = data
+                                          ?.map((e) =>
+                                              MessageModel.fromJson(e.data()))
+                                          .toList() ??
+                                      [];
+                          
+                                  if (_list.isNotEmpty) {
+                                    return ListView.builder(
+                                      controller: _scrollController,
+                                      reverse: false,
+                                      itemCount: _list.length,
+                                      padding: const EdgeInsets.only(top: 10),
+                                      physics: const BouncingScrollPhysics(),
+                                      itemBuilder: (context, index) {
+                                        final messages = _list[index];
+                                        return Consumer<ChatScreenModelProvider>(
+                                          builder: (context,
+                                              chatScreenModelProvider, child) {
+                                            return
+                                                //GestureDetector(
+                                                //     onLongPress: () {
+                                                //       setState(() {
+                                                //         messages.isSelected =
+                                                //             !messages.isSelected;
+                                                //       });
+                                                //     },
+                          
+                                                InkWell(
+                                                    onLongPress: () {
+                                                      // chatScreenModelProvider
+                                                      //     .toggleMessage(
+                                                      //         widget.chats);
+                                                      chatScreenModelProvider
+                                                          .selectedMessages
+                                                          .add(_list[index]);
+                                                    },
+                                                    child: MessageBubble(
+                                                        chats: _list[index]));
+                                          },
+                                        );
                                       },
-                                      child: MessageBubble(chats: _list[index]),
                                     );
-
-                                    
-                                  },
-                                );
-                              } else {
-                                return Center(
-                                    child: Text(
-                                  " say hi",
-                                  style: TextStyle(fontSize: 20),
-                                ));
+                                  } else {
+                                    return const Center(
+                                        child: Text(
+                                      " say hi",
+                                      style: TextStyle(fontSize: 20),
+                                    ));
+                                  }
                               }
-                          }
-                        })),
-                chatBox(),
-                if (_emoji)
-                  SizedBox(
-                      height: h! * 0.3,
-                      child: EmojiPicker(
-                        textEditingController: _messageController,
-                        config: Config(
-                          columns: 7,
-                          emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
-                        ),
-                      ))
-              ],
+                            })),
+                    chatBox(),
+                    if (_emoji)
+                      SizedBox(
+                          height: h! * 0.3,
+                          child: EmojiPicker(
+                            textEditingController: _messageController,
+                            config: Config(
+                              columns: 7,
+                              emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
+                            ),
+                          ))
+                  ],
+                ),
+              ),]
             ),
           ),
         ),
@@ -143,7 +168,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
 
   Widget chatBox() {
     return Container(
-      decoration: BoxDecoration(color: AppColors.appBarColor1),
+      decoration: const BoxDecoration(color: AppColors.appBarColor1),
       child: Row(
         children: [
           Container(
@@ -164,7 +189,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                 focusColor: Colors.blue,
                 hintText: "Type something ....",
                 border: InputBorder.none,
-                hintStyle: TextStyle(color: AppColors.whitecolor),
+                hintStyle: const TextStyle(color: AppColors.whitecolor),
                 prefixIcon: InkWell(
                   onTap: () {
                     setState(() {
@@ -178,7 +203,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                         _emoji = !_emoji;
                       });
                     },
-                    child: Icon(
+                    child: const Icon(
                       Icons.emoji_emotions_rounded,
                       color: Color.fromARGB(255, 27, 59, 74),
                     ),
@@ -188,7 +213,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                   onTap: () {
                     bottomSheet();
                   },
-                  child: Icon(
+                  child: const Icon(
                     Icons.image,
                     color: AppColors.whitecolor,
                   ),
@@ -208,7 +233,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                 }
                 _scrollToBottom();
               },
-              icon: CircleAvatar(
+              icon: const CircleAvatar(
                 child: Icon(
                   Icons.send,
                   color: AppColors.blackcolor,
@@ -221,7 +246,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
 
   Widget _appBar() {
     return Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
             gradient: LinearGradient(
                 colors: [AppColors.appBarColor1, AppColors.appBarColor2])),
         child: InkWell(
@@ -249,7 +274,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.arrow_back,
                         color: Colors.white,
                       ),
@@ -271,7 +296,8 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                             imageUrl: list.isNotEmpty
                                 ? list[0].image
                                 : widget.user.image,
-                            errorWidget: (context, url, error) => CircleAvatar(
+                            errorWidget: (context, url, error) =>
+                                const CircleAvatar(
                               child: Icon(Icons.person),
                             ),
                           ),
@@ -287,17 +313,17 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                           padding: const EdgeInsets.only(top: 2.0),
                           child: Text(
                             list.isNotEmpty ? list[0].name : widget.user.name,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: AppColors.chatUserTitleColor,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 0.02,
                         ),
                         Text(
-                          list.isNotEmpty
+                          (list.isNotEmpty)
                               ? list[0].isOnline
                                   ? 'Online'
                                   : Mydate.getLastActiveTime(
@@ -306,7 +332,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                               : Mydate.getLastActiveTime(
                                   context: context,
                                   lastActive: widget.user.lastActive),
-                          style: TextStyle(
+                          style: const TextStyle(
                               color: AppColors.chatUserTitleColor,
                               fontSize: 13,
                               fontWeight: FontWeight.w400),
@@ -320,10 +346,9 @@ class _ChatScreenViewState extends State<ChatScreenView> {
   }
 
   void bottomSheet() {
-   
     showModalBottomSheet(
         context: context,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.horizontal(left: Radius.circular(40.0))),
         builder: (context) {
           return Container(
@@ -333,8 +358,8 @@ class _ChatScreenViewState extends State<ChatScreenView> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
+                const Padding(
+                  padding: EdgeInsets.only(top: 20.0),
                   child: Text(
                     "Pick Your Profile Image",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -366,9 +391,9 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                             Navigator.pop(context);
                           }
                         },
-                        child: Column(
+                        child: const Column(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.camera,
                               color: Color.fromARGB(246, 121, 39, 39),
                               size: 40,
@@ -398,9 +423,9 @@ class _ChatScreenViewState extends State<ChatScreenView> {
                           Navigator.pop(context);
                         }
                       },
-                      child: Column(
+                      child: const Column(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.image,
                             color: Color.fromARGB(246, 121, 39, 39),
                             size: 40,
@@ -420,7 +445,7 @@ class _ChatScreenViewState extends State<ChatScreenView> {
   void _scrollToBottom() {
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
   }
